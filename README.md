@@ -1,13 +1,22 @@
 # purecore.io java wrapper
 
+## Gradle
+```groovy
+compile group: 'io.purecore', name: 'api', version: '1.1.0'
+
+// or
+
+compile 'io.purecore:api:1.1.0'
+```
+
 ## Maven
-
-    <dependency>
-      <groupId>io.purecore</groupId>
-      <artifactId>api</artifactId>
-      <version>1.1.0</version>
-    </dependency>
-
+```xml
+<dependency>
+    <groupId>io.purecore</groupId>
+    <artifactId>api</artifactId>
+    <version>1.1.0</version>
+</dependency>
+```
 ## Are you in the right place?
 
 If you are building a Minecraft plugin, this is **not** what you are looking for. You should get a mc-plugin purecore.io instance. In order to do that, please, take a look at the mc-plugin repo to see how to get an existing purecore.io instance on a loaded server.
