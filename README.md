@@ -2,22 +2,22 @@
 
 ## Gradle
 ```groovy
-compile group: 'io.purecore', name: 'api', version: '1.1.0'
+compile group: 'io.purecore', name: 'api', version: '+'
 
 // or
 
-compile 'io.purecore:api:1.1.0'
+compile 'io.purecore:api:+'
 ```
 
 ## Maven
-[Badge-SonatypeReleases]: https://img.shields.io/nexus/r/https/oss.sonatype.org/io.purecore/api.svg "Sonatype Releases"
 ```xml
 <dependency>
     <groupId>io.purecore</groupId>
     <artifactId>api</artifactId>
-    <version>Last Version, Look At The Nexus Badge</version>
+    <version>RELEASE</version>
 </dependency>
 ```
+
 ## Are you in the right place?
 
 If you are building a Minecraft plugin, this is **not** what you are looking for. You should get a mc-plugin purecore.io instance. In order to do that, please, take a look at the mc-plugin repo to see how to get an existing purecore.io instance on a loaded server.
