@@ -14,10 +14,4 @@ If you are building a Minecraft plugin, this is **not** what you are looking for
 
 If you are using purecore.io for editing the core functionality of purecore's java wrapper, this is the place.
 
-```mermaid
-graph LR
-A[io.purecore.mcplugin] -- dependency --> B(api.purecore.io)
-A -- actual instance --> C(getCore function)
-```
-
 In order to code a purecore addon for craftbukkit, forge, or others, just grab the live core instance with getCore(), do **not** create a new Core() object, or you won't be able to access the instance information.
