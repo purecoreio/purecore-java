@@ -9,12 +9,12 @@ compile group: 'io.purecore', name: 'api', version: '1.1.0'
 compile 'io.purecore:api:1.1.0'
 ```
 
-## Maven
+## Maven [Badge-SonatypeReleases]: https://img.shields.io/nexus/r/https/oss.sonatype.org/io.purecore/api.svg "Sonatype Releases"
 ```xml
 <dependency>
     <groupId>io.purecore</groupId>
     <artifactId>api</artifactId>
-    <version>1.1.0</version>
+    <version>Last Version, Look At The Nexus Badge</version>
 </dependency>
 ```
 ## Are you in the right place?
