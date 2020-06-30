@@ -1,0 +1,12 @@
+io.purecore.api
+io.purecore.api.advancement
+io.purecore.api.command
+io.purecore.api.connection
+io.purecore.api.exception
+io.purecore.api.instance
+io.purecore.api.key
+io.purecore.api.location
+io.purecore.api.punishment
+io.purecore.api.request
+io.purecore.api.statistic
+io.purecore.api.user
