@@ -9,13 +9,35 @@ import java.io.IOException;
 
 public class Core {
 
+    public enum Mode {
+        UNKNOWN,
+        LISTENER,
+        TALKER
+    }
+
+    private Mode mode;
     private String key;
+
+    public Core(String key, Mode mode) {
+        this.key=key;
+        this.mode=mode;
+    }
 
     public Core(String key) {
         this.key=key;
+        this.mode=Mode.UNKNOWN;
     }
 
     public Core() {
+        this.mode=Mode.UNKNOWN;
+    }
+
+    public void setMode(Mode mode) {
+        this.mode = mode;
+    }
+
+    public Mode getMode() {
+        return mode;
     }
 
     public Core(Key key) {
