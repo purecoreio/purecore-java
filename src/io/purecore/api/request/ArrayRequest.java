@@ -113,21 +113,34 @@ public class ArrayRequest extends Core {
 
     public JsonArray getResult() throws IOException, CallException, ApiException {
 
-        HttpURLConnection conn = this.urlConnection(this.getURL(),this.getParamBytes());
-        String body = CharStreams.toString(new InputStreamReader(conn.getInputStream(), Charsets.UTF_8));
+        if(Call.CLOSE_ACTIVE_CONNECTIONS == this.call && isSocketAvailable()){
 
-        JsonElement result = new JsonParser().parse(body);
-        if(result.isJsonArray()){
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("uuid",  params.get("uuid"));
 
-            return result.getAsJsonArray();
+            getSocket().emit("closeConnections",jsonObject.toString());
+            jsonObject.addProperty("socket",  true);
+            return new JsonArray();
 
         } else {
 
-            JsonObject finalResult = result.getAsJsonObject();
-            if(finalResult.has("error")){
-                throw new ApiException(finalResult.get("error").getAsString());
+            HttpURLConnection conn = this.urlConnection(this.getURL(),this.getParamBytes());
+            String body = CharStreams.toString(new InputStreamReader(conn.getInputStream(), Charsets.UTF_8));
+
+            JsonElement result = new JsonParser().parse(body);
+            if(result.isJsonArray()){
+
+                return result.getAsJsonArray();
+
             } else {
-                throw new CallException("Received invalid type, expecting array, received object");
+
+                JsonObject finalResult = result.getAsJsonObject();
+                if(finalResult.has("error")){
+                    throw new ApiException(finalResult.get("error").getAsString());
+                } else {
+                    throw new CallException("Received invalid type, expecting array, received object");
+                }
+
             }
 
         }

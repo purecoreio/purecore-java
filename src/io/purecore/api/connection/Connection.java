@@ -38,8 +38,11 @@ public class Connection extends Core {
         this.core=core;
 
         // player
-        JsonObject playerdata = json.get("player").getAsJsonObject();
-        Player player = new Player(this.core, playerdata.get("username").getAsString(), UUID.fromString(playerdata.get("uuid").getAsString()),playerdata.get("verified").getAsBoolean());
+        Player player = new Player(this.core,null,null,false);
+        if(json.has("player")){
+            JsonObject playerdata = json.get("player").getAsJsonObject();
+            player = new Player(this.core, playerdata.get("username").getAsString(), UUID.fromString(playerdata.get("uuid").getAsString()),playerdata.get("verified").getAsBoolean());
+        }
 
         // status
         JsonObject statusdata = json.get("status").getAsJsonObject();

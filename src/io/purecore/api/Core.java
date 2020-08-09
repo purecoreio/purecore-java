@@ -1,5 +1,7 @@
 package io.purecore.api;
 
+import com.google.gson.Gson;
+import io.purecore.api.connection.Connection;
 import io.purecore.api.event.*;
 import io.purecore.api.exception.ApiException;
 import io.purecore.api.exception.CallException;
@@ -12,6 +14,10 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class Core {
 
@@ -24,11 +30,11 @@ public class Core {
     private Mode mode;
     private final String key;
 
-    private static Instance instance;
-    private static String lastKey;
+    private static Map<String,Instance> instance;
+    private static Map<String,String> lastKey;
 
-    private static Socket socket;
-    private static boolean socketAvailable;
+    private static Map<String, Socket> socket;
+    private static Map<String, Boolean> socketAvailable;
 
     private static HandlerCollection handlerManager = new HandlerCollection();
 
@@ -49,8 +55,8 @@ public class Core {
         return handlerManager;
     }
 
-    public static boolean isSocketAvailable() {
-        return socketAvailable;
+    public boolean isSocketAvailable() {
+        return socketAvailable.get(getKey());
     }
 
     public Core(String key) {
@@ -81,12 +87,11 @@ public class Core {
     public Core(Core core){
         this.key= core.getKeyLegacy().getHash();
         this.mode = core.getMode();
-        socket=getSocket();
         setupSocket();
     }
 
-    public static Socket getSocket() {
-        return socket;
+    public Socket getSocket() {
+        return socket.get(this.getKey());
     }
 
     public Core getCore(){
@@ -102,37 +107,59 @@ public class Core {
     }
 
     public Instance getInstance() throws ApiException, IOException, CallException, JSONException {
-        if(!this.getKey().equals(lastKey)){
-            this.lastKey=key;
-            this.instance= new Instance(this);
+        if(!this.getKey().equals(lastKey.get(getKey()))){
+            lastKey.put(getKey(),key);
+            instance.put(getKey(),new Instance(this));
         }
-        return instance;
+        return instance.get(getKey());
     }
 
     public void setupSocket() {
+        Gson gson = new Gson();
         if(socket==null){
-            socketAvailable=false;
+            socketAvailable.put(getKey(),false);
             try{
-                socket = IO.socket("http://localhost:3000");
-                socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+                socket.put(getKey(),IO.socket("https://socket.purecore.io:3000"));
+                socket.get(getKey()).on(Socket.EVENT_CONNECT, new Emitter.Listener() {
                     @Override
                     public void call(Object... args) {
-                        socket.emit("handshakeRequest",getKey());
+                        socket.get(getKey()).emit("handshakeRequest",getKey());
                     }
                 }).on("handshake", new Emitter.Listener() {
                     @Override
                     public void call(Object... args) {
-                        socketAvailable=true;
+                        socketAvailable.put(getKey(),true);
                         handlerManager.emitSocketReadyEvent(new SocketReadyEvent());
+                    }
+                }).on("connectionCreated", new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+                        handlerManager.emitConnectionCreatedEvent(new ConnectionCreatedEvent(new Connection(getCore(),null,null,null,null,null)));
+                    }
+                }).on("connectionCreationError", new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+                        handlerManager.emitConnectionCreatedErrorEvent(new ConnectionCreationErrorEvent(Arrays.toString(args)));
+                    }
+                }).on("connectionsClosed", new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+                        List<Connection> connectionList = new ArrayList<>();
+                        handlerManager.emitConnectionClosedEvent(new ConnectionsClosedEvent(connectionList));
+                    }
+                }).on("connectionsClosingError", new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+                        handlerManager.emitConnectionClosedErrorEvent(new ConnectionsClosingErrorEvent(Arrays.toString(args)));
                     }
                 }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
                     @Override
                     public void call(Object... args) {
-                        socketAvailable=false;
+                        socketAvailable.put(getKey(),false);
                         handlerManager.emitSocketUnavailableEvent(new SocketUnavailableEvent());
                     }
                 });
-                socket.connect();
+                socket.get(getKey()).connect();
             } catch (URISyntaxException exception){
                 // ignore
             }
