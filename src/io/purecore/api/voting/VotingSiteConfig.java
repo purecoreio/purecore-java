@@ -6,6 +6,7 @@ import io.purecore.api.exception.ApiException;
 import io.purecore.api.exception.CallException;
 import io.purecore.api.instance.Network;
 import io.purecore.api.request.ObjectRequest;
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -35,11 +36,11 @@ public class VotingSiteConfig {
         }
     }
 
-    public VotingSiteConfig setURL(String url) throws IOException, ApiException, CallException {
+    public VotingSiteConfig setURL(String url) throws IOException, ApiException, CallException, JSONException {
         return this.setURL(URI.create(url).toURL());
     }
 
-    public VotingSiteConfig setURL(URL url) throws ApiException, IOException, CallException {
+    public VotingSiteConfig setURL(URL url) throws ApiException, IOException, CallException, JSONException {
         ObjectRequest request = new ObjectRequest(this.network.getCore(), ObjectRequest.Call.SETUP_VOTING_SITE);
         LinkedHashMap<String, String> params = new LinkedHashMap<>();
         params.put("site",this.votingSite.uuid);

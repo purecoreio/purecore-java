@@ -10,6 +10,7 @@ import io.purecore.api.punishment.Punishment;
 import io.purecore.api.punishment.Report;
 import io.purecore.api.request.ObjectRequest;
 import io.purecore.api.voting.VotingSite;
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class Player extends Core {
 
     }
 
-    public Player(Core core, String username) throws ApiException, IOException, CallException {
+    public Player(Core core, String username) throws ApiException, IOException, CallException, JSONException {
 
         super(core.getKey());
         this.core=core;
@@ -59,11 +60,11 @@ public class Player extends Core {
         this.username = json.get("username").getAsString();
     }
 
-    public Punishment punish(Player player, List<Offence> offenceList) throws ApiException, IOException, CallException {
+    public Punishment punish(Player player, List<Offence> offenceList) throws ApiException, IOException, CallException, JSONException {
         return new Punishment(this.core, player, this, offenceList);
     }
 
-    public boolean vote(VotingSite site) throws ApiException, IOException, CallException {
+    public boolean vote(VotingSite site) throws ApiException, IOException, CallException, JSONException {
 
         LinkedHashMap<String,String> params = new LinkedHashMap<>();
         if(site.uuid==null){
@@ -78,7 +79,7 @@ public class Player extends Core {
         return true;
     }
 
-    public Report report(Player player, List<Offence> offenceList, String content, boolean anon) throws ApiException, IOException, CallException {
+    public Report report(Player player, List<Offence> offenceList, String content, boolean anon) throws ApiException, IOException, CallException, JSONException {
 
         LinkedHashMap<String,String> params = new LinkedHashMap<>();
         params.put("player",player.coreid);

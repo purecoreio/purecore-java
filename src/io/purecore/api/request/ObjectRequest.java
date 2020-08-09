@@ -8,6 +8,8 @@ import com.google.gson.JsonParser;
 import io.purecore.api.Core;
 import io.purecore.api.exception.ApiException;
 import io.purecore.api.exception.CallException;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -118,21 +120,36 @@ public class ObjectRequest extends Core {
 
     }
 
-    public JsonObject getResult() throws IOException, CallException, ApiException {
+    public JsonObject getResult() throws IOException, CallException, ApiException, JSONException {
 
-        HttpURLConnection conn = this.urlConnection(this.getURL(),this.getParamBytes());
-        String body = CharStreams.toString(new InputStreamReader(conn.getInputStream(), Charsets.UTF_8));
+        if(Call.CONNECTION_CREATE == this.call && isSocketAvailable()){
 
-        JsonElement result = new JsonParser().parse(body);
-        if(result.isJsonObject()){
-            JsonObject finalResult = result.getAsJsonObject();
-            if(finalResult.has("error")){
-                throw new ApiException(finalResult.get("error").getAsString());
-            } else {
-                return finalResult;
-            }
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("ip", params.get("ip"));
+            jsonObject.addProperty("uuid",  params.get("uuid"));
+            jsonObject.addProperty("username",  params.get("username"));
+
+            getSocket().emit("createConnection",jsonObject.toString());
+            jsonObject.addProperty("socket",  true);
+            return jsonObject;
+
         } else {
-            throw new CallException("Received invalid type, expecting object, received array");
+
+            HttpURLConnection conn = this.urlConnection(this.getURL(),this.getParamBytes());
+            String body = CharStreams.toString(new InputStreamReader(conn.getInputStream(), Charsets.UTF_8));
+
+            JsonElement result = new JsonParser().parse(body);
+            if(result.isJsonObject()){
+                JsonObject finalResult = result.getAsJsonObject();
+                if(finalResult.has("error")){
+                    throw new ApiException(finalResult.get("error").getAsString());
+                } else {
+                    return finalResult;
+                }
+            } else {
+                throw new CallException("Received invalid type, expecting object, received array");
+            }
+
         }
     }
 

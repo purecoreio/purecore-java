@@ -6,6 +6,7 @@ import io.purecore.api.Core;
 import io.purecore.api.exception.ApiException;
 import io.purecore.api.exception.CallException;
 import io.purecore.api.request.ObjectRequest;
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.*;
@@ -173,7 +174,7 @@ public class Execution extends Core {
         return needsOnline;
     }
 
-    public boolean markAsExecuted() throws IOException, ApiException, CallException {
+    public boolean markAsExecuted() throws IOException, ApiException, CallException, JSONException {
 
         LinkedHashMap<String, String> params = new LinkedHashMap<>();
         params.put("execution", this.uuid);

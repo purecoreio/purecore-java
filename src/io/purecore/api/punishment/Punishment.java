@@ -7,6 +7,7 @@ import io.purecore.api.exception.ApiException;
 import io.purecore.api.exception.CallException;
 import io.purecore.api.user.Player;
 import io.purecore.api.request.ObjectRequest;
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.List;
 
 public class Punishment extends Core {
 
-    public Punishment(Core core, Player player, Player moderator, List<Offence> offenceList) throws ApiException, IOException, CallException {
+    public Punishment(Core core, Player player, Player moderator, List<Offence> offenceList) throws ApiException, IOException, CallException, JSONException {
 
         super(core.getKey());
 

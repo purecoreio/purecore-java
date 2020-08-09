@@ -6,6 +6,7 @@ import io.purecore.api.exception.ApiException;
 import io.purecore.api.exception.CallException;
 import io.purecore.api.instance.Instance;
 import io.purecore.api.request.ObjectRequest;
+import org.json.JSONException;
 
 import java.io.IOException;
 
@@ -44,7 +45,7 @@ public class Key {
         this.instance=new Instance(new Core(this),json.get("instance").getAsJsonObject());
     }
 
-    public String regenHash() throws ApiException, IOException, CallException {
+    public String regenHash() throws ApiException, IOException, CallException, JSONException {
 
         Core core = new Core(this.hash);
         JsonObject request = new ObjectRequest(core, ObjectRequest.Call.REGEN_HASH).getResult();

@@ -12,14 +12,15 @@ import io.purecore.api.exception.CallException;
 import io.purecore.api.request.ArrayRequest;
 import io.purecore.api.request.ObjectRequest;
 import io.purecore.api.user.Player;
+import org.json.JSONException;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.*;
 
 public class Instance extends Core {
 
-    private Core core;
     private String uuid;
     private String name;
     private Type instanceType;
@@ -30,31 +31,38 @@ public class Instance extends Core {
     }
 
     public Instance(Core core, JsonObject json){
-        super(core.getKey());
-        this.core=core;
+        super(core.getKey(), core.getMode());
         this.uuid=json.get("uuid").getAsString();
         this.name=json.get("name").getAsString();
         this.instanceType= Type.valueOf(json.get("type").getAsString());
     }
 
     public Instance(Core core, String uuid, String name, Type type) {
-        super(core.getKey());
-        this.core=core;
+        super(core.getKey(), core.getMode());
         this.uuid=uuid;
         this.name=name;
         this.instanceType=type;
     }
 
-    public Connection openConnection(Player player, InetSocketAddress address) throws ApiException, IOException, CallException {
+
+    public Connection openConnection(Player player, InetAddress address) throws ApiException, IOException, CallException, JSONException {
 
         LinkedHashMap<String, String> params = new LinkedHashMap<>();
-        params.put("ip", address.getAddress().getHostAddress());
+        params.put("ip", address.getHostAddress());
         params.put("uuid", player.getUUID().toString());
         params.put("username", player.getUsername());
 
-        JsonObject result = new ObjectRequest(this.core, ObjectRequest.Call.CONNECTION_CREATE, params).getResult();
-        return new Connection(this.core,result);
+        JsonObject result = new ObjectRequest(this.getCore(), ObjectRequest.Call.CONNECTION_CREATE, params).getResult();
+        if(!result.has("socket")){
+            return new Connection(this.getCore(),result);
+        } else {
+            return new Connection(getCore(),null,null,null,player,this);
+        }
 
+    }
+
+    public Connection openConnection(Player player, InetSocketAddress address) throws ApiException, IOException, CallException, JSONException {
+        return openConnection(player,address.getAddress());
     }
 
     public List<Connection> closeConnections(Player player) throws ApiException, IOException, CallException {
@@ -64,21 +72,20 @@ public class Instance extends Core {
         LinkedHashMap<String, String> params = new LinkedHashMap<>();
         params.put("uuid", player.getUUID().toString());
 
-        JsonArray result = new ArrayRequest(this.core, ArrayRequest.Call.CLOSE_ACTIVE_CONNECTIONS, params).getResult();
+        JsonArray result = new ArrayRequest(this.getCore(), ArrayRequest.Call.CLOSE_ACTIVE_CONNECTIONS, params).getResult();
         for (JsonElement connectionJson:result) {
-            connectionList.add(new Connection(this.core,connectionJson.getAsJsonObject()));
+            connectionList.add(new Connection(this.getCore(),connectionJson.getAsJsonObject()));
         }
 
         return connectionList;
 
     }
 
-    public Instance(Core core) throws ApiException, IOException, CallException {
+    public Instance(Core core) throws ApiException, IOException, CallException, JSONException {
 
-        super(core.getKey());
-        this.core=core;
+        super(core.getKey(), core.getMode());
 
-        ObjectRequest request = new ObjectRequest(this.core, ObjectRequest.Call.INSTANCE_GET);
+        ObjectRequest request = new ObjectRequest(this.getCore(), ObjectRequest.Call.INSTANCE_GET);
         JsonElement response = request.getResult();
         if(response.getAsJsonObject().has("server") && response.getAsJsonObject().has("network")){
             if(!response.getAsJsonObject().get("server").isJsonNull()){
@@ -103,10 +110,10 @@ public class Instance extends Core {
 
         List<Execution> pendingExecutions = new ArrayList<>();
 
-        JsonArray executionResult = new ArrayRequest(this.core, ArrayRequest.Call.GET_PENDING_EXECUTIONS).getResult();
+        JsonArray executionResult = new ArrayRequest(this.getCore(), ArrayRequest.Call.GET_PENDING_EXECUTIONS).getResult();
         for (JsonElement jsonExecution:executionResult) {
             if(jsonExecution.isJsonObject()){
-                pendingExecutions.add(new Execution(this.core, jsonExecution.getAsJsonObject()));
+                pendingExecutions.add(new Execution(this.getCore(), jsonExecution.getAsJsonObject()));
             }
         }
 
@@ -136,11 +143,11 @@ public class Instance extends Core {
         LinkedHashMap<String, String> params = new LinkedHashMap<>();
         params.put("players", playerListSerialized);
 
-        JsonArray executionResult = new ArrayRequest(this.core, ArrayRequest.Call.GET_PENDING_EXECUTIONS_REDUCED, params).getResult();
+        JsonArray executionResult = new ArrayRequest(this.getCore(), ArrayRequest.Call.GET_PENDING_EXECUTIONS_REDUCED, params).getResult();
 
         for (JsonElement jsonExecution:executionResult) {
             if(jsonExecution.isJsonObject()){
-                pendingExecutions.add(new Execution(this.core, jsonExecution.getAsJsonObject()));
+                pendingExecutions.add(new Execution(this.getCore(), jsonExecution.getAsJsonObject()));
             }
         }
 
@@ -152,11 +159,11 @@ public class Instance extends Core {
     }
 
     public Network asNetwork(){
-        return new Network(this.core,this.uuid,this.name,this.instanceType);
+        return new Network(this.getCore(),this.uuid,this.name,this.instanceType);
     }
 
     public Server asServer(){
-        return new Server(this.core,this.uuid,this.name,this.instanceType);
+        return new Server(this.getCore(),this.uuid,this.name,this.instanceType);
     }
 
     public String getName() {
@@ -165,10 +172,6 @@ public class Instance extends Core {
 
     public String getId() {
         return uuid;
-    }
-
-    public Core getCore() {
-        return core;
     }
 
     public Type getType() {

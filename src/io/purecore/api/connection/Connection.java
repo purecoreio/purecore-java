@@ -20,7 +20,7 @@ public class Connection extends Core {
     public Connection(Core core, String instance_uuid, Location location, Status status, Player player, Instance instance)
     {
 
-        super(core.getKey());
+        super(core.getKey(),core.getMode());
 
         this.core=core;
 
