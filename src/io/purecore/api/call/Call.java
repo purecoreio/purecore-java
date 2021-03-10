@@ -26,6 +26,7 @@ public class Call {
         this.endpoint=path;
         this.hash=key.getHash();
         this.client=client;
+        this.params=new HashMap<>();
     }
 
     public Call addParam(Param param, String value){

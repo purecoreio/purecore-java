@@ -14,10 +14,10 @@ public class ExecutionContext {
         this.username=object.get("username").getAsString();
         this.id=object.get("id").getAsString();
         this.packageName=object.get("packageName").getAsString();
-        if(object.get("quantity").isJsonNull()){
+        if(!object.get("quantity").isJsonNull()){
             this.quantity=object.get("quantity").getAsFloat();
         }
-        if(object.get("quantityDifference").isJsonNull()){
+        if(!object.get("quantityDifference").isJsonNull()){
             this.quantityDifference=object.get("quantityDifference").getAsFloat();
         }
     }

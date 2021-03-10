@@ -9,9 +9,8 @@
         <module name="api" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="8">
       <module name="api" target="8" />
-      <module name="purecore-java" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>
