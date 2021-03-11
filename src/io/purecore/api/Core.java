@@ -78,7 +78,7 @@ public class Core {
     public static void emit(String key, JsonElement data) throws JSONException {
         Core.socket.emit(key,new JSONObject(new Gson().toJson(data)));
     }
-    public static void emit(String key, HashMap<String,String> data) throws JSONException {
+    public static void emit(String key, HashMap<String,Object> data) throws JSONException {
         Core.emit(key, new Gson().toJsonTree(data));
     }
 
@@ -108,7 +108,16 @@ public class Core {
                 for (Handler handler:Core.handlers){
                     handler.onAuthenticating();
                 }
-                Core.emit("handshake",Core.key.getHash());
+                try {
+                    // try sending version acknowledgement
+                    HashMap<String, Object> data = new HashMap<>();
+                    data.put(Param.Key.getParam(),Core.key.getHash());
+                    data.put(Param.Version.getParam(), Core.getClientVersion());
+                    Core.emit("handshake", data);
+                } catch (JSONException e) {
+                    // json failed, send standalone key
+                    Core.emit("handshake", Core.key.getHash());
+                }
             }
         }).on("connected", new Emitter.Listener() {
             @Override

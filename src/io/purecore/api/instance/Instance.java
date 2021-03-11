@@ -36,7 +36,7 @@ public class Instance {
 
     public void connect(String platformId, String platformUsername, String ip) throws IOException, ApiException, JSONException {
         if(Core.isConnected()){
-            HashMap<String, String> data = new HashMap<>();
+            HashMap<String, Object> data = new HashMap<>();
             data.put(Param.PlatformId.getParam(),platformId);
             data.put(Param.PlatformName.getParam(), platformUsername);
             data.put(Param.Ip.getParam(), ip);
@@ -52,7 +52,7 @@ public class Instance {
 
     public void disconnect(String platformId) throws IOException, ApiException, JSONException {
         if(Core.isConnected()){
-            HashMap<String, String> data = new HashMap<>();
+            HashMap<String, Object> data = new HashMap<>();
             data.put(Param.PlatformId.getParam(),platformId);
             Core.emit("playerLogout", data);
         } else {
