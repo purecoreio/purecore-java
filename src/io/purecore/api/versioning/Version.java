@@ -39,7 +39,8 @@ public class Version {
         String versionNoDot = version.replaceAll("\\.","");
         int inv = versionNoDot.length() - valid;
         if(inv <= 0)  throw new InvalidVersionFormatException("Impossible to get representative version");
-        return (float) Integer.parseInt(versionNoDot) / (inv ^ 10);
+        int noDotInt = Integer.parseInt(versionNoDot);
+        return (float) noDotInt / (float) Math.pow(10,inv);
     }
 
     public boolean isCompatible(Game game, GameSoftware gameSoftware, String gameVersion) throws InvalidVersionFormatException {
