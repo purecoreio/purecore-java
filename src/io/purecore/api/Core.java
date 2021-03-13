@@ -61,7 +61,9 @@ public class Core {
         if(Core.socket==null){
             Core.connect();
         }
-        Core.handlers.add(handler);
+        if(!Core.handlers.contains(handler)){
+            Core.handlers.add(handler);
+        }
     }
 
     protected static Key getKey(){
